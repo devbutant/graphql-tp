@@ -83,9 +83,6 @@ input CreatePostInput {
   """Content of the post"""
   content: String!
 
-  """Age of the post"""
-  age: Int
-
   """Published status of the post"""
   published: Boolean
 
@@ -102,9 +99,6 @@ input UpdatePostInput {
 
   """Content of the post"""
   content: String!
-
-  """Age of the post"""
-  age: Int
 
   """Published status of the post"""
   published: Boolean

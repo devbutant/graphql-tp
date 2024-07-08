@@ -8,8 +8,20 @@ export class PostsService {
   constructor(private readonly prisma: PrismaService) {}
 
   create(createPostInput: CreatePostInput) {
+    // return this.prisma.post.create({
+    //   data: createPostInput,
+    // });
+    const { authorId, ...data } = createPostInput;
     return this.prisma.post.create({
-      data: createPostInput,
+      data: {
+        ...data,
+        author: {
+          connect: { id: authorId },
+        },
+      },
+      include: {
+        author: true,
+      },
     });
   }
 

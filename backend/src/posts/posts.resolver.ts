@@ -8,8 +8,15 @@ import { PostsService } from './posts.service';
 export class PostsResolver {
   constructor(private readonly postsService: PostsService) {}
 
+  // @Mutation(() => Post)
+  // createPost(@Args('createPostInput') createPostInput: CreatePostInput) {
+  //   return this.postsService.create(createPostInput);
+  // }
+
   @Mutation(() => Post)
-  createPost(@Args('createPostInput') createPostInput: CreatePostInput) {
+  async createPost(
+    @Args('createPostInput') createPostInput: CreatePostInput,
+  ): Promise<Post> {
     return this.postsService.create(createPostInput);
   }
 

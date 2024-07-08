@@ -1,8 +1,11 @@
-// PostsList.tsx
-
+// export default PostsList;
 import { useMutation, useQuery } from "@apollo/client";
 import React, { useState } from "react";
-import { CREATE_POST } from "../../graphql/mutations/posts";
+import {
+    CREATE_POST,
+    REMOVE_POST,
+    UPDATE_POST,
+} from "../../graphql/mutations/posts";
 import { GET_POSTS } from "../../graphql/queries/posts";
 import { Post } from "../../graphql/types/posts";
 
@@ -10,8 +13,7 @@ import "./style.css";
 
 interface AddPostForm {
     title: string;
-    content?: string;
-    age?: number;
+    content: string;
     published?: boolean;
     authorId: number;
 }
@@ -19,6 +21,8 @@ interface AddPostForm {
 const PostsList: React.FC = () => {
     const { loading, error, data, refetch } = useQuery(GET_POSTS);
     const [createPost] = useMutation(CREATE_POST);
+    const [updatePost] = useMutation(UPDATE_POST);
+    const [removePost] = useMutation(REMOVE_POST);
 
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState<AddPostForm>({
@@ -28,12 +32,15 @@ const PostsList: React.FC = () => {
         authorId: 0,
     });
 
-    // const [updateForm, setUpdateForm] = useState(false);
-    // const [idPost, setIdPost] = useState(0);
+    const [updateForm, setUpdateForm] = useState(false);
+    const [idPost, setIdPost] = useState(0);
 
     const handleAddPost = async () => {
+        formData.authorId = 16;
         try {
-            await createPost({
+            const {
+                data: { createPost: newPost },
+            } = await createPost({
                 variables: {
                     createPostInput: {
                         title: formData.title,
@@ -43,6 +50,8 @@ const PostsList: React.FC = () => {
                     },
                 },
             });
+            console.log("New Post:", newPost);
+
             setFormData({
                 title: "",
                 content: "",
@@ -51,47 +60,50 @@ const PostsList: React.FC = () => {
             });
             refetch();
         } catch (error) {
-            console.error("Erreur lors de l'ajout d'utilisateur:", error);
+            console.error("Erreur lors de l'ajout du post:", error);
         }
     };
 
-    // const handleDeletePost = async (id: number) => {
-    //     try {
-    //         await removePost({
-    //             variables: {
-    //                 id,
-    //             },
-    //         });
-    //         refetch();
-    //     } catch (error) {
-    //         console.error(
-    //             "Erreur lors de la suppression d'utilisateur:",
-    //             error
-    //         );
-    //     }
-    // };
+    const handleDeleteUser = async (id: number) => {
+        try {
+            await removePost({
+                variables: {
+                    id,
+                },
+            });
+            refetch();
+        } catch (error) {
+            console.error(
+                "Erreur lors de la suppression d'utilisateur:",
+                error
+            );
+        }
+    };
 
-    // const handleUpdatePost = async () => {
-    //     try {
-    //         // @ts-expect-error -ignore
-    //         const age = formData.age ? parseInt(formData.age) : undefined;
-
-    //         await updatePost({
-    //             variables: {
-    //                 updatePostInput: {
-    //                     id: idPost,
-    //                     email: formData.email,
-    //                     name: formData.name,
-    //                     age,
-    //                 },
-    //             },
-    //         });
-    //         setFormData({ email: "", name: "", age: undefined });
-    //         refetch();
-    //     } catch (error) {
-    //         console.error("Erreur lors de l'ajout d'utilisateur:", error);
-    //     }
-    // };
+    const handleUpdateUser = async () => {
+        try {
+            await updatePost({
+                variables: {
+                    updatePostInput: {
+                        id: idPost,
+                        title: formData.title,
+                        content: formData.content,
+                        published: formData.published,
+                        authorId: 16,
+                    },
+                },
+            });
+            setFormData({
+                title: "",
+                content: "",
+                published: undefined,
+                authorId: 0,
+            });
+            refetch();
+        } catch (error) {
+            console.error("Erreur lors de l'ajout d'utilisateur:", error);
+        }
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
@@ -105,11 +117,11 @@ const PostsList: React.FC = () => {
         setShowForm(!showForm);
     };
 
-    // const toggleUpdateForm = (id: number) => {
-    //     setShowForm(!showForm);
-    //     setUpdateForm(!updateForm);
-    //     setIdPost(id);
-    // };
+    const toggleUpdateForm = (id: number) => {
+        setShowForm(!showForm);
+        setUpdateForm(!updateForm);
+        setIdPost(id);
+    };
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error :(</p>;
@@ -137,13 +149,6 @@ const PostsList: React.FC = () => {
                         onChange={handleChange}
                     />
                     <input
-                        type="number"
-                        name="age"
-                        placeholder="Âge"
-                        value={formData.age || ""}
-                        onChange={handleChange}
-                    />
-                    <input
                         type="checkbox"
                         name="published"
                         checked={formData.published}
@@ -157,9 +162,18 @@ const PostsList: React.FC = () => {
                         value={formData.authorId}
                         onChange={handleChange}
                     />
-                    <div className="btn btn-submit" onClick={handleAddPost}>
-                        Ajouter
-                    </div>
+                    {updateForm ? (
+                        <div
+                            className="btn btn-submit"
+                            onClick={handleUpdateUser}
+                        >
+                            Modifier
+                        </div>
+                    ) : (
+                        <div className="btn btn-submit" onClick={handleAddPost}>
+                            Ajouter
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -168,11 +182,30 @@ const PostsList: React.FC = () => {
                     <div className="post" key={post.id}>
                         <p>Title: {post.title}</p>
                         <p>Content: {post.content}</p>
-                        <p>Author ID: {post.author.id}</p>
-                        <p>Author Name: {post.author.name}</p>
-                        <p>Author Email: {post.author.email}</p>
+                        {post.author ? (
+                            <>
+                                <p>Author ID: {post.author.id}</p>
+                                <p>Author Name: {post.author.name}</p>
+                                <p>Author Email: {post.author.email}</p>
+                            </>
+                        ) : (
+                            <p>No Author</p>
+                        )}
                         {post.published && <p>Post publié</p>}
                         <hr />
+
+                        <div
+                            className="btn btn-update"
+                            onClick={() => toggleUpdateForm(post.id)}
+                        >
+                            Modifier
+                        </div>
+                        <div
+                            className="btn btn-delete"
+                            onClick={() => handleDeleteUser(post.id)}
+                        >
+                            Supprimer
+                        </div>
                     </div>
                 ))}
             </div>
