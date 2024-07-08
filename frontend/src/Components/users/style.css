@@ -1,0 +1,27 @@
+.user-list {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+
+    border: 8px solid orange;
+}
+
+.user {
+    min-width: 20rem;
+    margin-right: 1rem;
+    background-color: rgba(127, 255, 212, 0.497);
+    display: flex;
+    flex-direction: column;
+    border: 5px solid rgba(5, 123, 84, 0.497);
+}
+
+.btn {
+    border: 5px solid rgba(127, 255, 212, 0.497);
+    background-color: rgba(5, 123, 84, 0.497);
+    color: white;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 1rem;
+}
