@@ -1,0 +1,114 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  """Unique identifier for the user"""
+  id: Int!
+
+  """Email address of the user"""
+  email: String!
+
+  """Name of the user"""
+  name: String!
+
+  """Age of the user"""
+  age: Int
+}
+
+type Post {
+  """Unique identifier for the post"""
+  id: Int!
+
+  """Title of the post"""
+  title: String!
+
+  """Content of the post"""
+  content: String!
+
+  """Age of the post"""
+  age: Int
+
+  """Published status of the post"""
+  published: Boolean
+
+  """Author of the post"""
+  author: User
+}
+
+type Query {
+  users: [User!]!
+  user(id: Int!): User!
+  posts: [Post!]!
+  post(id: Int!): Post!
+}
+
+type Mutation {
+  createUser(createUserInput: CreateUserInput!): User!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  removeUser(id: Int!): User!
+  createPost(createPostInput: CreatePostInput!): Post!
+  updatePost(updatePostInput: UpdatePostInput!): Post!
+  removePost(id: Int!): Post!
+}
+
+input CreateUserInput {
+  """Email address of the user"""
+  email: String!
+
+  """Name of the user"""
+  name: String!
+
+  """Age of the user"""
+  age: Int
+}
+
+input UpdateUserInput {
+  id: Int!
+
+  """Email address of the user"""
+  email: String
+
+  """Name of the user"""
+  name: String
+
+  """Age of the user"""
+  age: Int
+}
+
+input CreatePostInput {
+  """Title of the post"""
+  title: String!
+
+  """Content of the post"""
+  content: String!
+
+  """Age of the post"""
+  age: Int
+
+  """Published status of the post"""
+  published: Boolean
+
+  """ID of the author"""
+  authorId: Int!
+}
+
+input UpdatePostInput {
+  """Unique identifier for the post"""
+  id: Int!
+
+  """Title of the post"""
+  title: String!
+
+  """Content of the post"""
+  content: String!
+
+  """Age of the post"""
+  age: Int
+
+  """Published status of the post"""
+  published: Boolean
+
+  """ID of the author"""
+  authorId: Int!
+}
