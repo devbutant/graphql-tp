@@ -9,6 +9,8 @@ import {
 import { GET_POSTS } from "../../graphql/queries/posts";
 import { Post } from "../../graphql/types/posts";
 
+import { GET_USERS } from "../../graphql/queries/users";
+import { User } from "../../graphql/types/users";
 import "./style.css";
 
 interface AddPostForm {
@@ -19,6 +21,8 @@ interface AddPostForm {
 }
 
 const PostsList: React.FC = () => {
+    const { data: userData } = useQuery(GET_USERS);
+
     const { loading, error, data, refetch } = useQuery(GET_POSTS);
     const [createPost] = useMutation(CREATE_POST);
     const [updatePost] = useMutation(UPDATE_POST);
@@ -34,9 +38,11 @@ const PostsList: React.FC = () => {
 
     const [updateForm, setUpdateForm] = useState(false);
     const [idPost, setIdPost] = useState(0);
+    const [authorId, setAuthorId] = useState(20);
 
     const handleAddPost = async () => {
-        formData.authorId = 16;
+        console.log("formData:", formData);
+
         try {
             const {
                 data: { createPost: newPost },
@@ -46,7 +52,7 @@ const PostsList: React.FC = () => {
                         title: formData.title,
                         content: formData.content,
                         published: formData.published,
-                        authorId: formData.authorId,
+                        authorId: authorId,
                     },
                 },
             });
@@ -89,7 +95,7 @@ const PostsList: React.FC = () => {
                         title: formData.title,
                         content: formData.content,
                         published: formData.published,
-                        authorId: 16,
+                        authorId: authorId,
                     },
                 },
             });
@@ -121,6 +127,13 @@ const PostsList: React.FC = () => {
         setShowForm(!showForm);
         setUpdateForm(!updateForm);
         setIdPost(id);
+    };
+
+    const getPostAndAuth = (postId: number, authorId: number) => {
+        toggleUpdateForm(postId);
+        setIdPost(postId);
+        setAuthorId(authorId);
+        setFormData({ ...formData, authorId });
     };
 
     if (loading) return <p>Loading...</p>;
@@ -162,6 +175,13 @@ const PostsList: React.FC = () => {
                         value={formData.authorId}
                         onChange={handleChange}
                     />
+                    <select name="" id="">
+                        {userData.users.map((user: User) => (
+                            <option key={user.id} value={user.id}>
+                                {user.name} ({user.email})
+                            </option>
+                        ))}
+                    </select>
                     {updateForm ? (
                         <div
                             className="btn btn-submit"
@@ -179,6 +199,7 @@ const PostsList: React.FC = () => {
 
             <div className="post-list">
                 {data.posts.map((post: Post) => (
+                    // Je veux console log mon post
                     <div className="post" key={post.id}>
                         <p>Title: {post.title}</p>
                         <p>Content: {post.content}</p>
@@ -193,13 +214,17 @@ const PostsList: React.FC = () => {
                         )}
                         {post.published && <p>Post publié</p>}
                         <hr />
+                        {post.author && (
+                            <div
+                                className="btn btn-update"
+                                onClick={() =>
+                                    getPostAndAuth(post.id, post.author.id)
+                                }
+                            >
+                                Modifier
+                            </div>
+                        )}
 
-                        <div
-                            className="btn btn-update"
-                            onClick={() => toggleUpdateForm(post.id)}
-                        >
-                            Modifier
-                        </div>
                         <div
                             className="btn btn-delete"
                             onClick={() => handleDeleteUser(post.id)}

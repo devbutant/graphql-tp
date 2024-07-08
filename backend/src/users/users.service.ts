@@ -14,11 +14,20 @@ export class UsersService {
   }
 
   findAll() {
-    return this.prisma.user.findMany();
+    return this.prisma.user.findMany({
+      include: {
+        posts: true,
+      },
+    });
   }
 
   findOne(id: number) {
-    return this.prisma.user.findUnique({ where: { id } });
+    return this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        posts: true,
+      },
+    });
   }
 
   update(id: number, updateUserInput: UpdateUserInput) {

@@ -26,11 +26,20 @@ export class PostsService {
   }
 
   findAll() {
-    return this.prisma.post.findMany();
+    return this.prisma.post.findMany({
+      include: {
+        author: true,
+      },
+    });
   }
 
   findOne(id: number) {
-    return this.prisma.post.findUnique({ where: { id } });
+    return this.prisma.post.findUnique({
+      where: { id },
+      include: {
+        author: true,
+      },
+    });
   }
 
   update(id: number, updatePostInput: UpdatePostInput) {
